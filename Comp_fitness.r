@@ -53,7 +53,7 @@ ci_lss <- function(ci_values){
     # NOT SURE IF THE XS VALUES WILL ALWAYS BE TRUE
     xs <- c(0,2,4,6)
     xs_m <- as.matrix(xs) 
-    reg <- lm.fit(xs_m, test_vals)
+    reg <- lm.fit(xs_m, ci_values)
     val <- as.numeric(coef(reg))
     return(val) 
 }
@@ -84,7 +84,15 @@ comp_df <- data.table::fread("test_fitness.csv")
 
 
 #Group the dataframe by strain, Generation, and replicate
+#nest but keep the strain, generation, and replicate as columns
+#Calculate the ci values for each strain, generation, and replicate
+
 
 grouped <- comp_df %>%
+    group_nest(strain, conditon, replicate, keep = TRUE) %>%
+    mutate(ci_values = map(data, comp_calc, gen1_id = 1)) 
+
+grouped$data
+    
 
 
