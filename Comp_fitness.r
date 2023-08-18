@@ -86,11 +86,13 @@ comp_df <- data.table::fread("test_fitness.csv")
 #Group the dataframe by strain, Generation, and replicate
 #nest but keep the strain, generation, and replicate as columns
 #Calculate the ci values for each strain, generation, and replicate
-
+#then use the ci_values to calculate LSS and fitness
 
 grouped <- comp_df %>%
     group_nest(strain, conditon, replicate, keep = TRUE) %>%
-    mutate(ci_values = map(data, comp_calc, gen1_id = 1)) 
+    mutate(ci_values = map(data, comp_calc, gen1_id = 1))%>%
+    mutate(lm_coef = map_dbl(ci_values, ci_lss))%>%
+    mutate(fitness = map_dbl(lm_coef, cal_fitness))
 
 grouped$data
     
